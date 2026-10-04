@@ -5,11 +5,15 @@ go 1.26.6
 require (
 	github.com/OpenRouterTeam/go-sdk v0.7.158
 	github.com/charmbracelet/bubbles v1.0.0
+	github.com/ebitengine/oto/v3 v3.5.1
+	github.com/hajimehoshi/go-mp3 v0.3.4
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.10.2
 )
 
 require (
+	github.com/ebitengine/purego v0.11.0 // indirect
+	github.com/jfreymuth/pulse v0.1.3 // indirect
 	github.com/spyzhov/ajson v0.8.0 // indirect
 	golang.org/x/exp v0.0.0-20260112195511-716be5621a96 // indirect
 )

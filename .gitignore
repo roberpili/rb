@@ -1,2 +1,4 @@
 .env
 rb
+
+internal/pomodoro/data/

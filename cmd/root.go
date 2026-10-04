@@ -18,6 +18,7 @@ func init() {
 		password.TUICommand,
 		openCmd,
 		aiCmd,
+		pomodoroCmd,
 	)
 }
 
