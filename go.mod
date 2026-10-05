@@ -6,6 +6,7 @@ require (
 	github.com/OpenRouterTeam/go-sdk v0.7.158
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/ebitengine/oto/v3 v3.5.1
+	github.com/godbus/dbus/v5 v5.2.2
 	github.com/hajimehoshi/go-mp3 v0.3.4
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.10.2

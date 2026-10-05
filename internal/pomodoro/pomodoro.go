@@ -5,11 +5,22 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"rb/internal/notification"
 	"syscall"
 	"time"
 )
 
-func Start(totalMinutes int) error {
+type Pomodoro struct {
+	notificator notification.Notificator
+}
+
+func NewPomodoro(notificator notification.Notificator) *Pomodoro {
+	return &Pomodoro{
+		notificator: notificator,
+	}
+}
+
+func (p *Pomodoro) Start(totalMinutes int) error {
 	if totalMinutes <= 0 {
 		return fmt.Errorf("total must be > 0")
 	}
@@ -20,24 +31,24 @@ func Start(totalMinutes int) error {
 
 	// build the session
 	plan := buildPlan(totalMinutes)
+
 	rounds := 0
 	for _, s := range plan {
 		if s.label == "STUDY" {
 			rounds++
 		}
 	}
-	fmt.Printf("Starting %d minutes pomodoro session (%d blocks)\n", totalMinutes, rounds)
+	fmt.Printf("Starting %d minutes pomodoro session (%d blocks)\n\n", totalMinutes, rounds)
 
 	for _, seg := range plan {
-		var err error
 		if seg.label == "STUDY" {
-			err = playBeginBell()
+			if err := playBeginBell(); err != nil {
+				return fmt.Errorf("failed to play study bell: %w", err)
+			}
 		} else {
-			err = playBreakBell()
-		}
-
-		if err != nil {
-			return fmt.Errorf("failed to play %s bell: %w", seg.label, err)
+			if err := playBreakBell(); err != nil {
+				return fmt.Errorf("failed to play break bell: %w", err)
+			}
 		}
 
 		if err := runTimer(ctx, seg.minutes, seg.label); err != nil {
@@ -45,9 +56,25 @@ func Start(totalMinutes int) error {
 		}
 
 		fmt.Printf("\n%s COMPLETED\n\n", seg.label)
+
+		if err := p.notificator.Notify(
+			seg.label+" finished",
+			"Time for the next block",
+		); err != nil {
+			fmt.Fprintf(os.Stderr, "notification failed: %v\n", err)
+		}
 	}
 
-	return playBeginBell() // finished
+	// finished
+	if err := playBeginBell(); err != nil {
+		return fmt.Errorf("failed to play finish bell: %w", err)
+	}
+
+	if err := p.notificator.Notify("Pomodoro finished", "Study session is completed"); err != nil {
+		fmt.Fprintf(os.Stderr, "notification failed: %v\n", err)
+	}
+
+	return nil
 }
 
 // replace time.Sleep allowing context
